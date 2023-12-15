@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "enerkon",
+  "private_key_id": "d3003496be5402aefc753accf7b4837bdf6c3777",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCyN8BD2jj52Qb5\nx+X3pMxikMf8FhORjc92pOs6CJjhVh/0j3zGuuPIqoXieiUr0rMIrTbiKar9Rtir\nkWteVzy8bqLD4fUP/mVp8xfe4q46LhAT7T6fytgXCsfJKs79KWzZ5pDJxmmvZxNa\nzzjhYLUWiHTUxtCxgw9J4fj3nWpanJYzCw10VhwdcutxZAo4qe1tSlGfGRiaxac1\nPGNgigpZIgheISUuQI67Q6xiItD/qD1L7PeVLd2/n33OpuRT8DkOOW5esaNCD5CR\nr6xgR2oug0tpn7KQ+0vJ1vmbPyoZEt0e30T0gZLAECR9acrCigOWgqeINSDwtB7H\n+OvSBIPVAgMBAAECggEAOr3wlAzeQdAcogEXFkDOE2D4Yele6teMveUPGZJS3dc2\n8jPHY3Ofd/lo5uTu0pqA44fActxcHV6YNTjZ5H8pqExpPtqAHZTzFXCIejFKTyf2\nqbLFtQK1piaqAm8nSb+5PrtmFvPcyvFVKlXqQDNRjQtOQwIDMLdrtyUSHH/Y2eN9\nN+3d8Azs9pe1ss5q/Wq0tOLzeK+oDX9Nuyyp+dxLOYy1eRjWfQkKhZUcbXnax7qO\nZAD8Zx6OQir7ADh0tF9twvTb09Zyg2feuTaoYAPFVFQx8HJUnUasHY1o7ebdQAce\nruTvmDsQR0qfS3gJg2I10n5jFQF+rZLx3v9pk8b7AwKBgQDXj5jE5V+AjxlHddPx\nqXnC93Y6QuC1WW1fXQYzaH6+V77jQCRcvAlx5EmqwNibUlhtgCu341MnXa4c6dpS\nqblmePM0eorjrcbLFvalP/f6Ko3c+Ul0nZb21k8M74G726P8SvMMjUcz+OIYJgl1\nhZNL6qevk+sOtNJJz+gUkxSwfwKBgQDTprvr315Et6kp1wBGNiGa/BS7/8BH141q\n/reHGO73S859yGzc8y8KmwC81XLnL8gcLlbQ2c+CPEQAejGVBtWTzz+FYUPtZymw\nx9O0FYGg5le7havlA3DUfUl5yIXLTrCT7SPrmED7pVovtCXs5Y3HtA3EYT2pOJwc\n6tMnwm3hqwKBgEgRi1rw8RATR7lbjIO0TLBBefaam3QmNOn4OPWBDzbmMTzbGg0j\nFOlOEM8U8JZlXoklm/g7+XYk3Oxvxv1yHzlCYNV/zuW2GMuXnti63VZ3WbyyX7us\nYGegWQeTH8XF9jqIeGAO7+pRYI4AUZNIGGn+RxftlV3yWIgzCX2vevBTAoGAFRG4\nC1cFD1opIN0iTdr9pWwKtFxVS9GNZmVM58n3n+6P872L+MLMoAWmISYudg0von6K\nbegA3DobmuCPJwKzKC+tZx2zoWJvqAV8caTibp3/hc9cuUOKa9y8/76Scxa2RUOK\nG93gOizPuYf5boe7gXHPHQmBFeNoxwgpVP/p6FkCgYEAv9dK2KUjLhDXPvlOdNNu\nlnQxuDk8TaToQ66vCQv/bHLOR/+Gh+FyOxP0v55hLEhHU4DCjPtBbMSdJeSFbcTp\nV4ZagcEKCwMe/rmIIBVGwMXS0Bo66cLoxaO+gdUXHbvevvczxf3BhpYrNmJw7Dn1\nWnIFurMhpOilRW4ejcUmRJM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "enerkon@enerkon.iam.gserviceaccount.com",
+  "client_id": "109817800948962836903",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/enerkon%40enerkon.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
