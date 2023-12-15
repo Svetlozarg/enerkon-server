@@ -116,20 +116,20 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   await Promise.all(logPromises);
 
   createKCCDocument(
-    createdDocuments[1].project,
-    createdDocuments[1].document.fileName,
+    createdDocuments[0].project,
+    createdDocuments[0].document.fileName,
     res
   );
 
   createReportDocument(
-    createdDocuments[0].document.fileName,
+    createdDocuments[1].document.fileName,
     title,
     createdProject.id
   );
 
   createResumeDocument(
-    createdDocuments[1].project,
-    createdDocuments[1].document.fileName,
+    createdDocuments[0].project,
+    createdDocuments[0].document.fileName,
     res
   );
 
