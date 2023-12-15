@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
-const { Buffer } = require("buffer");
+let Buffer = require("buffer").Buffer;
 const fetch = require("node-fetch");
 
 const FILE_URLS = [
@@ -17,38 +17,37 @@ const connectDb = async () => {
       useUnifiedTopology: true,
     });
 
-    const uploadsFolderPath = path.resolve("./uploads");
+    const uploadsFolderPath = path.join("./uploads");
 
     if (!fs.existsSync(uploadsFolderPath)) {
-      await fs.mkdir(uploadsFolderPath);
+      fs.mkdirSync(uploadsFolderPath);
       console.log("Uploads folder created.");
     } else {
       console.log("Uploads folder already exists.");
     }
 
-    // Download files and save to uploads folder using fetch
-    await Promise.all(
-      FILE_URLS.map(async (fileUrl) => {
-        const response = await fetch(fileUrl);
-        const arrayBuffer = await response.arrayBuffer();
+    for (const fileUrl of FILE_URLS) {
+      const response = await fetch(fileUrl);
+      const arrayBuffer = await response.arrayBuffer();
 
-        // Convert ArrayBuffer to Buffer using Buffer.from
-        const buffer = Buffer.from(arrayBuffer);
+      const buffer = Buffer.from
+        ? Buffer.from(arrayBuffer)
+        : new Buffer(arrayBuffer);
+      // a
 
-        // Extract the filename from the URL or provide a custom filename
-        const fileName = path.basename(fileUrl);
+      const fileName = path.basename(fileUrl);
 
-        // Save the file to the uploads folder
-        const filePath = path.join(uploadsFolderPath, fileName);
-        fs.writeFileSync(filePath, buffer, (err) => {
-          if (err) throw err;
-          console.log(`File downloaded and saved: ${fileName}`);
-        });
-      })
-    );
+      const filePath = path.join(uploadsFolderPath, fileName);
+      fs.writeFileSync(filePath, buffer, (err) => {
+        if (err) throw err;
+        console.log(`File downloaded and saved: ${fileName}`);
+      });
+    }
 
     console.log(
-      `Database connected: Host: ${connect.connection.host}, DB Name: ${connect.connection.name}`
+      "Database connected: ",
+      "Host:" + connect.connection.host,
+      "DB Name:" + connect.connection.name
     );
   } catch (err) {
     console.log(err);
