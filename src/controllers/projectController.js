@@ -358,23 +358,34 @@ exports.recreateProjectDocuments = asyncHandler(async (req, res, next) => {
     }
   }
 
-  createKCCDocument(
-    defaultDocuments[0].project,
-    defaultDocuments[0].document.fileName,
-    res
+  // map defaultDocuments and check if .documents.fileName contains Master_file and execute createReportDocument and createResumeDocument else createKCCDocument
+  const reportDocument = defaultDocuments.find((document) =>
+    document.document.fileName.includes("Master_file")
   );
 
-  createReportDocument(
-    defaultDocuments[1].document.fileName,
-    project.title,
-    defaultDocuments[1].project
+  const kccDocument = defaultDocuments.find(
+    (document) => !document.document.fileName.includes("Master_file")
   );
 
-  createResumeDocument(
-    defaultDocuments[0].project,
-    defaultDocuments[0].document.fileName,
-    res
-  );
+  if (reportDocument) {
+    createReportDocument(
+      reportDocument.document.fileName,
+      project.title,
+      project.id
+    );
+  }
+
+  if (kccDocument) {
+    createKCCDocument(kccDocument.project, kccDocument.document.fileName, res);
+  }
+
+  if (kccDocument) {
+    createResumeDocument(
+      kccDocument.project,
+      kccDocument.document.fileName,
+      res
+    );
+  }
 
   updateProjectLog(
     new mongoose.Types.ObjectId(projectId),
