@@ -1,6 +1,5 @@
 const { google } = require("googleapis");
 const fs = require("fs");
-const path = require("path");
 const { getFileMimeType, getFileName } = require("../fileHelpers");
 const apikeys = require("../../../apikey.json");
 
@@ -65,7 +64,7 @@ exports.uploadFileToDrive = async (filePath) => {
   }
 };
 
-exports.downloadFileFromDrive = async (fileName, res) => {
+exports.downloadFileFromDrive = async (fileName) => {
   const authClient = await authorize();
   const drive = google.drive({ version: "v3", auth: authClient });
 
@@ -94,10 +93,6 @@ exports.downloadFileFromDrive = async (fileName, res) => {
       console.log("Error downloading file.", err);
     })
     .pipe(dest);
-
-  const filePath = path.join("./uploads/", fileName);
-
-  res.download(filePath, fileName);
 };
 
 exports.deleteFileFromDrive = async (fileName) => {

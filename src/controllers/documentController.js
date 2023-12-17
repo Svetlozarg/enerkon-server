@@ -9,6 +9,7 @@ const {
 } = require("../helpers/FileStorage/fileStorageHelpers");
 const { updateProjectLog } = require("../helpers/logHelpers");
 const path = require("path");
+const fs = require("fs");
 
 //@desc Get all documents
 //@route GET /api/document/documents
@@ -163,6 +164,19 @@ exports.downloadDocument = asyncHandler(async (req, res, next) => {
   const { fileName } = req.params;
 
   await downloadFileFromDrive(fileName, res);
+
+  setTimeout(() => {
+    const filePath = path.join("./uploads/", fileName);
+
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, fileName);
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "File not found",
+      });
+    }
+  }, 1000);
 });
 
 //@desc Get document link to google drive
