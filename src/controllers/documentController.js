@@ -163,11 +163,6 @@ exports.downloadDocument = asyncHandler(async (req, res, next) => {
   const { fileName } = req.params;
 
   await downloadFileFromDrive(fileName, res);
-
-  res.status(200).json({
-    success: true,
-    message: "Document downloaded successfully",
-  });
 });
 
 //@desc Get document link to google drive

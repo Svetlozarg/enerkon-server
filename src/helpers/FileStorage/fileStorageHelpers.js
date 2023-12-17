@@ -97,7 +97,7 @@ exports.downloadFileFromDrive = async (fileName, res) => {
 
   const filePath = path.join("./uploads/", fileName);
 
-  res.download(filePath);
+  res.download(filePath, fileName);
 };
 
 exports.deleteFileFromDrive = async (fileName) => {
