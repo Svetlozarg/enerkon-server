@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 //@desc Register a user
-//@route POST /api/users/register
+//!@route POST /api/users/register
 //@access public
 const registerUser = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -38,7 +38,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Login user
-//@route POST /api/users/login
+//!@route POST /api/users/login
 //@access public
 const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -71,7 +71,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Current user info
-//@route POST /api/users/current
+//!@route POST /api/users/current
 //@access private
 const currentUser = asyncHandler(async (req, res, next) => {
   res.json(req.user);

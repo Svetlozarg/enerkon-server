@@ -12,7 +12,7 @@ const path = require("path");
 const fs = require("fs");
 
 //@desc Get all documents
-//@route GET /api/document/documents
+//?@route GET /api/document/documents
 //@access private
 exports.getAllDocuments = asyncHandler(async (req, res, next) => {
   const documents = await Document.find();
@@ -24,7 +24,7 @@ exports.getAllDocuments = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Get a document by ID
-//@route GET /api/document/:id
+//?@route GET /api/document/:id
 //@access private
 exports.getDocumentById = asyncHandler(async (req, res, next) => {
   const document = await Document.findById(req.params.id);
@@ -41,7 +41,7 @@ exports.getDocumentById = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Create a document
-//@route POST /api/document/create
+//!@route POST /api/document/create
 //@access private
 exports.createDocument = asyncHandler(async (req, res, next) => {
   const { projectId, filename } = req.body;
@@ -84,7 +84,7 @@ exports.createDocument = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Update a document
-//@route PUT /api/document/update/:id
+//!@route PUT /api/document/update/:id
 //@access private
 exports.updateDocument = asyncHandler(async (req, res, next) => {
   const documentId = req.params.id;
@@ -126,7 +126,7 @@ exports.updateDocument = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Delete a document
-//@route DELETE /api/document/delete
+//!@route DELETE /api/document/delete
 //@access private
 exports.deleteDocument = asyncHandler(async (req, res, next) => {
   const { id, fileName } = req.body;
@@ -158,7 +158,7 @@ exports.deleteDocument = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Download a document
-//@route GET /api/document/download/:fileName
+//?@route GET /api/document/download/:fileName
 //@access private
 exports.downloadDocument = asyncHandler(async (req, res, next) => {
   const { fileName } = req.params;
@@ -180,7 +180,7 @@ exports.downloadDocument = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Get document link to google drive
-//@route GET /api/document/preview/:fileName
+//?@route GET /api/document/preview/:fileName
 //@access private
 exports.getPreviewLink = asyncHandler(async (req, res, next) => {
   const { fileName } = req.params;

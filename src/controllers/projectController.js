@@ -13,11 +13,12 @@ const { updateProjectLog } = require("../helpers/logHelpers");
 const {
   uploadFileToDrive,
   deleteFileFromDrive,
+  downloadFileFromDrive,
 } = require("../helpers/FileStorage/fileStorageHelpers");
 const path = require("path");
 
 //@desc Get all projects
-//@route GET /api/project/projects
+//?@route GET /api/project/projects
 //@access private
 exports.getAllProjects = asyncHandler(async (req, res, next) => {
   const projects = await Project.find();
@@ -25,7 +26,7 @@ exports.getAllProjects = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Get a project by ID
-//@route GET /api/project/:id
+//?@route GET /api/project/:id
 //@access private
 exports.getProjectById = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
@@ -37,7 +38,7 @@ exports.getProjectById = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Get project documents
-//@route GET /api/project/:id/documents
+//?@route GET /api/project/:id/documents
 //@access private
 exports.getProjectDocuments = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
@@ -51,8 +52,66 @@ exports.getProjectDocuments = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: documents });
 });
 
+//@desc Get a project log
+//?@route GET /api/project/log/:id
+//@access private
+exports.getProjectLog = asyncHandler(async (req, res, next) => {
+  const projectLogs = await ProjectLog.find({ id: req.params.id });
+  if (!projectLogs) {
+    res.status(404);
+    throw new Error("Project log not found");
+  }
+  res.status(200).json({ success: true, data: projectLogs });
+});
+
+//@desc Get projects analytics
+//?@route GET /api/project/analytics
+//@access private
+exports.getProjectsAnalytics = asyncHandler(async (req, res, next) => {
+  const analytics = await Project.aggregate([
+    {
+      $group: {
+        _id: {
+          month: { $month: "$createdAt" },
+          year: { $year: "$createdAt" },
+        },
+        paidCount: {
+          $sum: { $cond: [{ $eq: ["$status", "Paid"] }, 1, 0] },
+        },
+        unpaidCount: {
+          $sum: { $cond: [{ $eq: ["$status", "Unpaid"] }, 1, 0] },
+        },
+      },
+    },
+    {
+      $sort: { "_id.year": 1, "_id.month": 1 },
+    },
+  ]);
+
+  const paidArray = Array(12).fill(0);
+  const unpaidArray = Array(12).fill(0);
+
+  analytics.forEach((entry) => {
+    const monthIndex = entry._id.month - 1;
+    paidArray[monthIndex] += entry.paidCount;
+    unpaidArray[monthIndex] += entry.unpaidCount;
+  });
+
+  res.json({
+    success: true,
+    data: {
+      paid: paidArray,
+      unpaid: unpaidArray,
+    },
+  });
+});
+
+//@desc Get projects analytics
+//?@route GET /api/project/analytics
+//@access private
+
 //@desc Create a project
-//@route POST /api/project/create
+//!@route POST /api/project/create
 //@access private
 exports.createProject = asyncHandler(async (req, res, next) => {
   const { title } = req.body;
@@ -141,7 +200,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Update a project
-//@route PUT /api/project/update/:id
+//!@route PUT /api/project/update/:id
 //@access private
 exports.updateProject = asyncHandler(async (req, res, next) => {
   const projectId = req.params.id;
@@ -187,7 +246,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Delete a project
-//@route DELETE /api/project/delete
+//!@route DELETE /api/project/delete
 //@access private
 exports.deleteProject = asyncHandler(async (req, res, next) => {
   const { id } = req.body;
@@ -237,56 +296,95 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@desc Get a project log
-//@route GET /api/project/log/:id
+//@desc Recreate a project
+//?@route GET /api/project/recreate/:project
 //@access private
-exports.getProjectLog = asyncHandler(async (req, res, next) => {
-  const projectLogs = await ProjectLog.find({ id: req.params.id });
-  if (!projectLogs) {
+exports.recreateProjectDocuments = asyncHandler(async (req, res, next) => {
+  const projectId = req.params.project;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
     res.status(404);
-    throw new Error("Project log not found");
+    throw new Error("Project not found");
   }
-  res.status(200).json({ success: true, data: projectLogs });
-});
 
-//@desc Get projects analytics
-//@route GET /api/project/analytics
-//@access private
-exports.getProjectsAnalytics = asyncHandler(async (req, res, next) => {
-  const analytics = await Project.aggregate([
-    {
-      $group: {
-        _id: {
-          month: { $month: "$createdAt" },
-          year: { $year: "$createdAt" },
-        },
-        paidCount: {
-          $sum: { $cond: [{ $eq: ["$status", "Paid"] }, 1, 0] },
-        },
-        unpaidCount: {
-          $sum: { $cond: [{ $eq: ["$status", "Unpaid"] }, 1, 0] },
-        },
-      },
-    },
-    {
-      $sort: { "_id.year": 1, "_id.month": 1 },
-    },
-  ]);
-
-  const paidArray = Array(12).fill(0);
-  const unpaidArray = Array(12).fill(0);
-
-  analytics.forEach((entry) => {
-    const monthIndex = entry._id.month - 1;
-    paidArray[monthIndex] += entry.paidCount;
-    unpaidArray[monthIndex] += entry.unpaidCount;
+  const defaultDocuments = await Document.find({
+    project: projectId,
+    default: true,
   });
+
+  if (defaultDocuments) {
+    for (const document of defaultDocuments) {
+      const downloadDocument = await Document.findById(
+        new mongoose.Types.ObjectId(document.id)
+      );
+
+      if (!downloadDocument) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: "Document not found",
+        });
+        throw new Error("Document not found");
+      }
+
+      await downloadFileFromDrive(document.document.fileName);
+    }
+  }
+
+  const documents = await Document.find({ project: projectId, default: false });
+
+  if (documents) {
+    for (const document of documents) {
+      if (document.default) {
+        continue;
+      }
+
+      const deleteDocument = await Document.findByIdAndDelete(
+        new mongoose.Types.ObjectId(document.id)
+      );
+
+      deleteFileFromDrive(document.document.fileName);
+
+      if (!deleteDocument) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: "Document not found",
+        });
+        throw new Error("Document not found");
+      }
+    }
+  }
+
+  createKCCDocument(
+    defaultDocuments[0].project,
+    defaultDocuments[0].document.fileName,
+    res
+  );
+
+  createReportDocument(
+    defaultDocuments[1].document.fileName,
+    project.title,
+    defaultDocuments[1].project
+  );
+
+  createResumeDocument(
+    defaultDocuments[0].project,
+    defaultDocuments[0].document.fileName,
+    res
+  );
+
+  updateProjectLog(
+    new mongoose.Types.ObjectId(projectId),
+    project.title,
+    "Проектът е пресъздаден",
+    Date.now()
+  );
 
   res.json({
     success: true,
-    data: {
-      paid: paidArray,
-      unpaid: unpaidArray,
-    },
+    message: "Project recreated successfully",
   });
 });
