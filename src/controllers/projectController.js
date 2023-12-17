@@ -110,6 +110,109 @@ exports.getProjectsAnalytics = asyncHandler(async (req, res, next) => {
 //?@route GET /api/project/analytics
 //@access private
 
+//@desc Recreate a project
+//?@route GET /api/project/recreate/:project
+//@access private
+exports.recreateProjectDocuments = asyncHandler(async (req, res, next) => {
+  const projectId = req.params.project;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    res.status(404);
+    throw new Error("Project not found");
+  }
+
+  const defaultDocuments = await Document.find({
+    project: projectId,
+    default: true,
+  });
+
+  if (defaultDocuments) {
+    for (const document of defaultDocuments) {
+      const downloadDocument = await Document.findById(
+        new mongoose.Types.ObjectId(document.id)
+      );
+
+      if (!downloadDocument) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: "Document not found",
+        });
+        throw new Error("Document not found");
+      }
+
+      await downloadFileFromDrive(document.document.fileName);
+    }
+  }
+
+  const documents = await Document.find({ project: projectId, default: false });
+
+  if (documents) {
+    for (const document of documents) {
+      if (document.default) {
+        continue;
+      }
+
+      const deleteDocument = await Document.findByIdAndDelete(
+        new mongoose.Types.ObjectId(document.id)
+      );
+
+      deleteFileFromDrive(document.document.fileName);
+
+      if (!deleteDocument) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: "Document not found",
+        });
+        throw new Error("Document not found");
+      }
+    }
+  }
+
+  const reportDocument = defaultDocuments.find((document) =>
+    document.document.fileName.includes("Master_file")
+  );
+
+  const kccDocument = defaultDocuments.find(
+    (document) => !document.document.fileName.includes("Master_file")
+  );
+
+  if (reportDocument) {
+    createReportDocument(
+      reportDocument.document.fileName,
+      project.title,
+      project.id
+    );
+  }
+
+  if (kccDocument) {
+    createKCCDocument(kccDocument.project, kccDocument.document.fileName, res);
+  }
+
+  if (kccDocument) {
+    createResumeDocument(
+      kccDocument.project,
+      kccDocument.document.fileName,
+      res
+    );
+  }
+
+  updateProjectLog(
+    new mongoose.Types.ObjectId(projectId),
+    project.title,
+    "Проектът е пресъздаден",
+    Date.now()
+  );
+
+  res.json({
+    success: true,
+    message: "Project recreated successfully",
+  });
+});
+
 //@desc Create a project
 //!@route POST /api/project/create
 //@access private
@@ -293,109 +396,5 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   res.json({
     success: true,
     message: "Project deleted successfully",
-  });
-});
-
-//@desc Recreate a project
-//?@route GET /api/project/recreate/:project
-//@access private
-exports.recreateProjectDocuments = asyncHandler(async (req, res, next) => {
-  const projectId = req.params.project;
-
-  const project = await Project.findById(projectId);
-
-  if (!project) {
-    res.status(404);
-    throw new Error("Project not found");
-  }
-
-  const defaultDocuments = await Document.find({
-    project: projectId,
-    default: true,
-  });
-
-  if (defaultDocuments) {
-    for (const document of defaultDocuments) {
-      const downloadDocument = await Document.findById(
-        new mongoose.Types.ObjectId(document.id)
-      );
-
-      if (!downloadDocument) {
-        res.status(404);
-        res.json({
-          success: false,
-          message: "Document not found",
-        });
-        throw new Error("Document not found");
-      }
-
-      await downloadFileFromDrive(document.document.fileName);
-    }
-  }
-
-  const documents = await Document.find({ project: projectId, default: false });
-
-  if (documents) {
-    for (const document of documents) {
-      if (document.default) {
-        continue;
-      }
-
-      const deleteDocument = await Document.findByIdAndDelete(
-        new mongoose.Types.ObjectId(document.id)
-      );
-
-      deleteFileFromDrive(document.document.fileName);
-
-      if (!deleteDocument) {
-        res.status(404);
-        res.json({
-          success: false,
-          message: "Document not found",
-        });
-        throw new Error("Document not found");
-      }
-    }
-  }
-
-  // map defaultDocuments and check if .documents.fileName contains Master_file and execute createReportDocument and createResumeDocument else createKCCDocument
-  const reportDocument = defaultDocuments.find((document) =>
-    document.document.fileName.includes("Master_file")
-  );
-
-  const kccDocument = defaultDocuments.find(
-    (document) => !document.document.fileName.includes("Master_file")
-  );
-
-  if (reportDocument) {
-    createReportDocument(
-      reportDocument.document.fileName,
-      project.title,
-      project.id
-    );
-  }
-
-  if (kccDocument) {
-    createKCCDocument(kccDocument.project, kccDocument.document.fileName, res);
-  }
-
-  if (kccDocument) {
-    createResumeDocument(
-      kccDocument.project,
-      kccDocument.document.fileName,
-      res
-    );
-  }
-
-  updateProjectLog(
-    new mongoose.Types.ObjectId(projectId),
-    project.title,
-    "Проектът е пресъздаден",
-    Date.now()
-  );
-
-  res.json({
-    success: true,
-    message: "Project recreated successfully",
   });
 });
