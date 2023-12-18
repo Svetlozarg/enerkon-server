@@ -26,7 +26,7 @@ const uploadFile = (authClient, filePath) => {
 
     const fileMetaData = {
       name: getFileName(filePath),
-      parents: ["11WAtF3Ppi9Sfp2AkqDbMAldQPFgkigWy"],
+      parents: ["1DeaVaoSLAR9n6R5UdhKi0VURCQVSPeC4"],
     };
 
     drive.files.create(
