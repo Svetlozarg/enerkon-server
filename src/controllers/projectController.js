@@ -16,6 +16,7 @@ const {
   downloadFileFromDrive,
 } = require("../helpers/FileStorage/fileStorageHelpers");
 const path = require("path");
+const ProjectLog = require("../models/projectLog");
 
 //@desc Get all projects
 //?@route GET /api/project/projects
