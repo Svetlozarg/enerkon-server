@@ -9,6 +9,7 @@ const {
   createProject,
   updateProject,
   recreateProjectDocuments,
+  recreateProject,
 } = require("../controllers/projectController");
 const validateToken = require("../middleware/validateTokenHandler");
 const upload = require("../middleware/upload");
@@ -24,5 +25,11 @@ router.delete("/delete", validateToken, deleteProject);
 router.get("/log/:id", validateToken, getProjectLog);
 router.get("/projects/analytics", validateToken, getProjectsAnalytics);
 router.get("/recreate/:project", validateToken, recreateProjectDocuments);
+router.post(
+  "/recreate/:project",
+  validateToken,
+  upload.array("files", 2),
+  recreateProject
+);
 
 module.exports = router;

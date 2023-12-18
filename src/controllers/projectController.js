@@ -107,11 +107,7 @@ exports.getProjectsAnalytics = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@desc Get projects analytics
-//?@route GET /api/project/analytics
-//@access private
-
-//@desc Recreate a project
+//@desc Recreate project's KCC, Resume and Report docu
 //?@route GET /api/project/recreate/:project
 //@access private
 exports.recreateProjectDocuments = asyncHandler(async (req, res, next) => {
@@ -397,5 +393,110 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   res.json({
     success: true,
     message: "Project deleted successfully",
+  });
+});
+
+//@desc Recreate project from new Project.xml and Master_file.xlsx
+//!@route POST /api/project/recreate/:project
+//@access private
+exports.recreateProject = asyncHandler(async (req, res, next) => {
+  const projectId = req.params.project;
+  const files = req.files;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    res.status(404);
+    throw new Error("Project not found");
+  }
+
+  const documents = await Document.find({
+    project: projectId,
+  });
+
+  if (documents) {
+    for (const document of documents) {
+      const downloadDocument = await Document.findByIdAndDelete(
+        new mongoose.Types.ObjectId(document.id)
+      );
+
+      deleteFileFromDrive(document.document.fileName);
+
+      if (!downloadDocument) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: "Document not found",
+        });
+        throw new Error("Document not found");
+      }
+    }
+  }
+
+  const documentPromises = files.map((file) => {
+    const newDocument = new Document({
+      title: file.originalname,
+      document: {
+        id: file.id,
+        fileName: file.filename,
+        originalName: file.originalname,
+        size: file.size,
+      },
+      project: projectId,
+      type: file.mimetype,
+      status: "Finished",
+      default: true,
+    });
+
+    return newDocument.save();
+  });
+
+  files.map((file) => {
+    const filePath = path.join("./uploads/", file.filename);
+
+    uploadFileToDrive(filePath);
+  });
+
+  const createdDocuments = await Promise.all(documentPromises);
+
+  const logPromises = createdDocuments.map((document) => {
+    return updateProjectLog(
+      new mongoose.Types.ObjectId(projectId),
+      document.title,
+      "Документът е създаден",
+      document.createdAt
+    );
+  });
+
+  await Promise.all(logPromises);
+
+  createKCCDocument(
+    createdDocuments[0].project,
+    createdDocuments[0].document.fileName,
+    res
+  );
+
+  createReportDocument(
+    createdDocuments[1].document.fileName,
+    project.title,
+    project.id
+  );
+
+  createResumeDocument(
+    createdDocuments[0].project,
+    createdDocuments[0].document.fileName,
+    res
+  );
+
+  updateProjectLog(
+    new mongoose.Types.ObjectId(projectId),
+    project.title,
+    "Проектът е пресъздаден",
+    Date.now()
+  );
+
+  res.json({
+    success: true,
+    message: "Project recreated successfully",
   });
 });
