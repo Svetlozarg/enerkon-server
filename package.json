@@ -23,8 +23,10 @@
     "express-async-handler": "^1.2.0",
     "googleapis": "^129.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.6.0",
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",
+    "officegen": "^0.6.5",
     "pizzip": "^3.1.4",
     "xml2js": "^0.6.2"
   },

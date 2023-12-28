@@ -57,15 +57,15 @@ exports.createReportDocument = async (
     // Write the output to a file
     const outputPath = path.resolve(
       "./uploads",
-      `Доклад_${projectName}_${formattedDate}.doc`
+      `Доклад_${projectName}_${formattedDate}.docx`
     );
     fs.writeFileSync(outputPath, buf);
 
     const newDocument = new Document({
-      title: `Доклад_${projectName}_${formattedDate}.doc`,
+      title: `Доклад_${projectName}_${formattedDate}.docx`,
       document: {
-        fileName: `Доклад_${projectName}_${formattedDate}.doc`,
-        originalName: `Доклад_${projectName}_${formattedDate}.doc`,
+        fileName: `Доклад_${projectName}_${formattedDate}.docx`,
+        originalName: `Доклад_${projectName}_${formattedDate}.docx`,
         size: 12600,
       },
       project: projectId,
